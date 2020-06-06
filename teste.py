@@ -2,23 +2,28 @@ import pygame
 import random
 from os import path
 
-pygame.init()
+# Estabelece a pasta que contem as figuras e sons.
+img_dir = path.join(path.dirname(__file__), 'img')
 
 # Dados gerais do jogo.
-TITULO = 'Climbing Tower'
-WIDTH = 500 # Largura da tela
-HEIGHT = 650 # Altura da tela
-TILE_SIZE = 50 # Tamanho de cada tile (cada tile é um quadrado)
+TITULO = 'Exemplo de Pulo com obstáculos'
+WIDTH = 480 # Largura da tela
+HEIGHT = 600 # Altura da tela
+TILE_SIZE = 40 # Tamanho de cada tile (cada tile é um quadrado)
 PLAYER_WIDTH = TILE_SIZE
 PLAYER_HEIGHT = int(TILE_SIZE * 1.5)
 FPS = 60 # Frames por segundo
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption(TITULO)
 
-img_dir = path.join(path.dirname(__file__), 'img')
-background = pygame.image.load('img/trump.png').convert()
-background = pygame.transform.scale(background, (500, 800))
+# Imagens
 PLAYER_IMG = 'player_img'
+
+# Define algumas variáveis com as cores básicas
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 
 # Define a aceleração da gravidade
 GRAVITY = 5
@@ -34,20 +39,21 @@ EMPTY = -1
 
 # Define o mapa com os tipos de tiles
 MAP = [
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, EMPTY, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, EMPTY, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, EMPTY, EMPTY, EMPTY],
-    [BLOCK, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-    [BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, EMPTY, EMPTY, EMPTY],
+    [BLOCK, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+    [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, BLOCK, EMPTY, EMPTY, EMPTY, BLOCK, BLOCK],
+    [EMPTY, EMPTY, BLOCK, EMPTY, BLOCK, BLOCK, BLOCK, BLOCK, EMPTY, BLOCK, BLOCK, BLOCK],
+    [BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK],
+    [BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK, BLOCK],
 ]
 
 # Define estados possíveis do jogador
@@ -188,7 +194,7 @@ def game_screen(screen):
     blocks = pygame.sprite.Group()
 
     # Cria Sprite do jogador
-    player = Player(assets[PLAYER_IMG], 15,2, blocks)
+    player = Player(assets[PLAYER_IMG], 12, 2, blocks)
 
     # Cria tiles de acordo com o mapa
     for row in range(len(MAP)):
@@ -240,11 +246,30 @@ def game_screen(screen):
         # Depois de processar os eventos.
         # Atualiza a acao de cada sprite. O grupo chama o método update() de cada Sprite dentre dele.
         all_sprites.update()
+
         # A cada loop, redesenha o fundo e os sprites
-        screen.blit(background, (0, 0))
+        screen.fill(BLACK)
         all_sprites.draw(screen)
+
         # Depois de desenhar tudo, inverte o display.
         pygame.display.flip()
+
+
+# Inicialização do Pygame.
+pygame.init()
+pygame.mixer.init()
+
+# Tamanho da tela.
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Nome do jogo
+pygame.display.set_caption(TITULO)
+
+# Imprime instruções
+print('*' * len(TITULO))
+print(TITULO.upper())
+print('*' * len(TITULO))
+print('Utilize as setas do teclado para andar e pular.')
 
 # Comando para evitar travamentos.
 try:
