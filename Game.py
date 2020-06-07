@@ -3,6 +3,7 @@ import random
 from os import path
 
 pygame.init()
+pygame.mixer.init()
 
 # Dados gerais do jogo.
 TITULO = 'Climbing Tower'
@@ -19,6 +20,11 @@ img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load('img/trump.png').convert()
 background = pygame.transform.scale(background, (500, 800))
 PLAYER_IMG = 'player_img'
+
+#Música de Fundo
+pygame.mixer.music.load('Mario.mp3')
+pygame.mixer.music.set_volume(0.03)
+pygame.mixer.music.play(loops=-1)
 
 # Define a aceleração da gravidade
 GRAVITY = 5
