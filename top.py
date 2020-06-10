@@ -2,44 +2,23 @@ import pygame
 import random
 from os import path
 
-pygame.init()
-pygame.mixer.init()
+# Estabelece a pasta que contem as figuras e sons.
+img_dir = path.join(path.dirname(__file__), 'img')
 
 # Dados gerais do jogo.
-TITULO = 'Climbing Tower'
-WIDTH = 500 # Largura da tela
-HEIGHT = 650 # Altura da tela
-TILE_SIZE = 50 # Tamanho de cada tile (cada tile é um quadrado)
-PLAYER_WIDTH = TILE_SIZE
-PLAYER_HEIGHT = int(TILE_SIZE * 1.5)
+TITULO = 'Exemplo de Fundo em Movimento'
+WIDTH = 600 # Largura da tela
+HEIGHT = 750 # Altura da tela
 FPS = 60 # Frames por segundo
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption(TITULO)
-
-img_dir = path.join(path.dirname(__file__), 'img')
-background = pygame.image.load('img/trump.png').convert()
-background = pygame.transform.scale(background, (500, 800))
 PLAYER_IMG = 'player_img'
-BLOCK = 'block'
+BLOCK_IMG = 'block_img'
+BACKGROUND_IMG = 'background_img'
 
-#Música de Fundo
-pygame.mixer.music.load('Mario.mp3')
-pygame.mixer.music.set_volume(0.03)
-pygame.mixer.music.play(loops=-1)
-
-# Define a aceleração da gravidade
-GRAVITY = 5
-# Define a velocidade inicial no pulo
-JUMP_SIZE = TILE_SIZE
-# Define a velocidade em x
-SPEED_X = 5
-#Começa o jogo com 6 blocos
+# Outras constantes
 INITIAL_BLOCKS = 6
+TILE_SIZE = 80
+SPEED_X = 10
 
-# Define estados possíveis do jogador
-STILL = 0
-JUMPING = 1
-FALLING = 2
 
 # Class que representa os blocos do cenário
 class Tile(pygame.sprite.Sprite):
@@ -58,106 +37,47 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
         # Posiciona o tile
-        self.rect.x =  x
-        self.rect.y =  y
+        self.rect.x = x
+        self.rect.y = y
 
+        self.speedx = 0
+
+    def update(self):
+        self.rect.x += self.speedx
 
 
 # Classe Jogador que representa o herói
 class Player(pygame.sprite.Sprite):
 
     # Construtor da classe.
-    def __init__(self, player_img, x, y, blocks):
+    def __init__(self, player_img):
 
         # Construtor da classe pai (Sprite).
         pygame.sprite.Sprite.__init__(self)
 
-        # Define estado atual
-        # Usamos o estado para decidir se o jogador pode ou não pular
-        self.state = STILL
-
-        # Ajusta o tamanho da imagem
-        player_img = pygame.transform.scale(player_img, (PLAYER_WIDTH, PLAYER_HEIGHT))
+        # Aumenta o tamanho da imagem
+        player_img = pygame.transform.scale(player_img, (100, 160))
 
         # Define a imagem do sprite. Nesse exemplo vamos usar uma imagem estática (não teremos animação durante o pulo)
         self.image = player_img
         # Detalhes sobre o posicionamento.
         self.rect = self.image.get_rect()
 
-        # Guarda o grupo de blocos para tratar as colisões
-        self.blocks = blocks
+        # Começa no centro da janela
+        self.rect.centerx = WIDTH / 2
+        self.rect.bottom = int(HEIGHT * 7 / 8)
 
-        # Posiciona o personagem
-        # row é o índice da linha embaixo do personagem
-        self.rect.x = WIDTH / 2
-        self.rect.bottom = int(HEIGHT * 7/8)
-
+        # O jogador não vai se mover, mas guardamos essa informação para o
+        # fundo e os objetos do mundo se moverem no sentido oposto.
         self.speedx = 0
-        self.speedy = 0
-
-    # Metodo que atualiza a posição do personagem
-    def update(self):
-        # Vamos tratar os movimentos de maneira independente.
-        # Primeiro tentamos andar no eixo y e depois no x.
-
-        # Tenta andar em y
-        # Atualiza a velocidade aplicando a aceleração da gravidade
-        self.speedy += GRAVITY
-        # Atualiza o estado para caindo
-        if self.speedy > 0:
-            self.state = FALLING
-        # Atualiza a posição y
-        self.rect.y += self.speedy
-        # Se colidiu com algum bloco, volta para o ponto antes da colisão
-        collisions = pygame.sprite.spritecollide(self, self.blocks, False)
-        # Corrige a posição do personagem para antes da colisão
-        for collision in collisions:
-            # Estava indo para baixo
-            if self.speedy > 0:
-                self.rect.bottom = collision.rect.top
-                # Se colidiu com algo, para de cair
-                self.speedy = 0
-                # Atualiza o estado para parado
-                self.state = STILL
-            # Estava indo para cima
-            elif self.speedy < 0:
-                self.rect.top = collision.rect.bottom
-                # Se colidiu com algo, para de cair
-                self.speedy = 0
-                # Atualiza o estado para parado
-                self.state = STILL
-
-        # Tenta andar em x
-        self.rect.x += self.speedx
-        # Corrige a posição caso tenha passado do tamanho da janela
-        if self.rect.left < 0:
-            self.rect.left = 0
-        elif self.rect.right >= WIDTH:
-            self.rect.right = WIDTH - 1
-        # Se colidiu com algum bloco, volta para o ponto antes da colisão
-        collisions = pygame.sprite.spritecollide(self, self.blocks, False)
-        # Corrige a posição do personagem para antes da colisão
-        for collision in collisions:
-            # Estava indo para a direita
-            if self.speedx > 0:
-                self.rect.right = collision.rect.left
-            # Estava indo para a esquerda
-            elif self.speedx < 0:
-                self.rect.left = collision.rect.right
-
-    # Método que faz o personagem pular
-    def jump(self):
-        # Só pode pular se ainda não estiver pulando ou caindo
-        if self.state == STILL:
-            self.speedy -= JUMP_SIZE
-            self.state = JUMPING
 
 
 # Carrega todos os assets de uma vez.
 def load_assets(img_dir):
     assets = {}
     assets[PLAYER_IMG] = pygame.image.load(path.join(img_dir, 'hero.png')).convert_alpha()
-    assets[BLOCK] = pygame.image.load(path.join(img_dir, 'Plataforma.png')).convert()
+    assets[BLOCK_IMG] = pygame.image.load(path.join(img_dir, 'Plataforma.png')).convert()
+    assets[BACKGROUND_IMG] = pygame.image.load(path.join(img_dir, 'trump.png')).convert()
     return assets
 
 
@@ -168,29 +88,29 @@ def game_screen(screen):
     # Carrega assets
     assets = load_assets(img_dir)
 
-    # Cria um grupo de todos os sprites.
-    all_sprites = pygame.sprite.Group()
-    # Cria um grupo somente com os sprites de bloco.
-    # Sprites de block são aqueles que impedem o movimento do jogador
-    blocks = pygame.sprite.Group()
-    world_sprites = pygame.sprite.Group()
+    # Carrega o fundo do jogo
+    background = assets[BACKGROUND_IMG]
+    # Redimensiona o fundo
+    background = pygame.transform.scale(background, (WIDTH, HEIGHT))
     background_rect = background.get_rect()
 
     # Cria Sprite do jogador
-    player = Player(assets[PLAYER_IMG], 15,2, blocks)
+    player = Player(assets[PLAYER_IMG])
+    # Cria um grupo de todos os sprites e adiciona o jogador.
+    all_sprites = pygame.sprite.Group()
     all_sprites.add(player)
 
-    # Cria tiles de acordo com o mapa
+    # Cria um grupo para guardar somente os sprites do mundo (obstáculos, objetos, etc).
+    # Esses sprites vão andar junto com o mundo (fundo)
+    world_sprites = pygame.sprite.Group()
+    # Cria blocos espalhados em posições aleatórias do mapa
     for i in range(INITIAL_BLOCKS):
         block_x = random.randint(0, WIDTH)
-        block_y = random.randint(0, HEIGHT)
-        block = Tile(assets[BLOCK], block_x, block_y)
+        block_y = random.randint(0, int(HEIGHT * 0.5))
+        block = Tile(assets[BLOCK_IMG], block_x, block_y)
         world_sprites.add(block)
         # Adiciona também no grupo de todos os sprites para serem atualizados e desenhados
         all_sprites.add(block)
-
-    # Adiciona o jogador no grupo de sprites por último para ser desenhado por
-    # cima dos blocos
 
     PLAYING = 0
     DONE = 1
@@ -215,8 +135,6 @@ def game_screen(screen):
                     player.speedx -= SPEED_X
                 elif event.key == pygame.K_RIGHT:
                     player.speedx += SPEED_X
-                elif event.key == pygame.K_UP or event.key == pygame.K_SPACE:
-                    player.jump()
 
             # Verifica se soltou alguma tecla.
             if event.type == pygame.KEYUP:
@@ -230,8 +148,9 @@ def game_screen(screen):
         # Como o jogador vai ficar parado, o fundo e os objetos no mundo devem
         # se mover com a velocidade do personagem no sentido oposto.
         for block in world_sprites:
-            block.speedy = -player.speedy
+            block.speedx = -player.speedx
 
+        # Atualiza a acao de cada sprite. O grupo chama o método update() de cada Sprite dentre dele.
         all_sprites.update()
 
         # Atualiza a posição da imagem de fundo.
@@ -251,7 +170,7 @@ def game_screen(screen):
                 block.kill()
                 block_x = random.randint(WIDTH, int(WIDTH * 1.5))
                 block_y = random.randint(0, int(HEIGHT * 0.5))
-                new_block = Tile(assets[BLOCK], block_x, block_y)
+                new_block = Tile(assets[BLOCK_IMG], block_x, block_y)
                 all_sprites.add(new_block)
                 world_sprites.add(new_block)
 
@@ -269,10 +188,22 @@ def game_screen(screen):
             # Precisamos desenhar o fundo à direita
             background_rect2.x += background_rect2.width
         screen.blit(background, background_rect2)
-            
-        
+
         all_sprites.draw(screen)
+
+        # Depois de desenhar tudo, inverte o display.
         pygame.display.flip()
+
+
+# Inicialização do Pygame.
+pygame.init()
+pygame.mixer.init()
+
+# Tamanho da tela.
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Nome do jogo
+pygame.display.set_caption(TITULO)
 
 # Comando para evitar travamentos.
 try:
