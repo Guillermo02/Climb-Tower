@@ -7,7 +7,7 @@ pygame.mixer.init()
 
 # Dados gerais do jogo.
 TITULO = 'Climbing Tower'
-WIDTH = 500 # Largura da tela
+WIDTH = 700 # Largura da tela
 HEIGHT = 650 # Altura da tela
 TILE_SIZE = 50 # Tamanho de cada tile (cada tile é um quadrado)
 PLAYER_WIDTH = TILE_SIZE
@@ -19,7 +19,7 @@ lista = [0,100,150,200,250,300,350,400,450,500]
 
 img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load('img/trump.png').convert()
-background = pygame.transform.scale(background, (500, 800))
+background = pygame.transform.scale(background, (700, 650))
 PLAYER_IMG = 'player_img'
 BLOCK = 'block'
 
@@ -33,9 +33,9 @@ GRAVITY = 5
 # Define a velocidade inicial no pulo
 JUMP_SIZE = TILE_SIZE
 # Define a velocidade em x
-SPEED_X = 5
+SPEED_X = 10
 #Começa o jogo com 6 blocos
-INITIAL_BLOCKS = 6
+INITIAL_BLOCKS = 8
 
 # Define estados possíveis do jogador
 STILL = 0
@@ -51,7 +51,7 @@ class Tile(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         # Aumenta o tamanho do tile.
-        tile_img = pygame.transform.scale(tile_img, (TILE_SIZE, TILE_SIZE))
+        tile_img = pygame.transform.scale(tile_img, (150, TILE_SIZE))
 
         # Define a imagem do tile.
         self.image = tile_img
@@ -66,7 +66,7 @@ class Tile(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
 
     # Construtor da classe.
-    def __init__(self, player_img, x, y, blocks):
+    def __init__(self, player_img,blocks):
 
         # Construtor da classe pai (Sprite).
         pygame.sprite.Sprite.__init__(self)
@@ -89,7 +89,7 @@ class Player(pygame.sprite.Sprite):
         # Posiciona o personagem
         # row é o índice da linha embaixo do personagem
         self.rect.x = WIDTH / 2
-        self.rect.bottom = int(HEIGHT * 7/8)
+        self.rect.bottom = HEIGHT
 
         self.speedx = 0
         self.speedy = 0
@@ -173,15 +173,16 @@ def game_screen(screen):
     # Cria um grupo de todos os sprites.
     all_sprites = pygame.sprite.Group()
 
-    # Cria um grupo somente com os sprites de bloco.
-    # Sprites de block são aqueles que impedem o movimento do jogador
-    blocks = pygame.sprite.Group()
+    # Esses sprites vão andar junto com o mundo (fundo)
     world_sprites = pygame.sprite.Group()
+
+    # Cria um grupo somente com os sprites de bloco.
+    blocks = pygame.sprite.Group()
     background_rect = background.get_rect()
 
     # Cria tiles de acordo com o mapa
     for i in range(INITIAL_BLOCKS):
-        block_x = random.randint(0, 800)
+        block_x = random.randint(0,700)
         block_y = random.randint(0, HEIGHT)
         block = Tile(assets[BLOCK], block_x, block_y)
         world_sprites.add(block)
@@ -189,11 +190,8 @@ def game_screen(screen):
         all_sprites.add(block)
 
     # Cria Sprite do jogador
-    player = Player(assets[PLAYER_IMG], 0,0, world_sprites)
+    player = Player(assets[PLAYER_IMG], world_sprites)
     all_sprites.add(player)
-
-    # Adiciona o jogador no grupo de sprites por último para ser desenhado por
-    # cima dos blocos
 
     PLAYING = 0
     DONE = 1
@@ -231,23 +229,21 @@ def game_screen(screen):
 
         # Verifica se algum bloco saiu da janela
         for block in world_sprites:
-            if block.rect.bottom < 0:
+            if block.rect.top > HEIGHT:
                 # Destrói o bloco e cria um novo no final da tela
                 block.kill()
-                block_x = random.randint(WIDTH, int(WIDTH * 1.5))
-                block_y = random.randint(0, int(HEIGHT * 0.5))
+                block_x = random.randint(0, 650)
+                block_y = random.randint(-300,-100)
                 new_block = Tile(assets[BLOCK], block_x, block_y)
                 all_sprites.add(new_block)
                 world_sprites.add(new_block)
 
         # A cada loop, redesenha o fundo e os sprites
-        # Assumimos que a imagem selecionada ocupa pelo menos o tamanho da janela.
-        # Além disso, ela deve ser cíclica, ou seja, o lado esquerdo deve ser continuação do direito.
-                # Depois de processar os eventos.
+        # Depois de processar os eventos.
         # Como o jogador vai ficar parado, o fundo e os objetos no mundo devem
         # se mover com a velocidade do personagem no sentido oposto.
         for block in world_sprites:
-            block.speedy = -player.speedy
+            block.rect.y -= player.speedy
 
         all_sprites.update()
 
@@ -261,7 +257,7 @@ def game_screen(screen):
         # Desenhamos a imagem novamente, mas deslocada em x.
         background_rect2 = background_rect.copy()
         if background_rect.bottom > 0:
-            # Precisamos desenhar o fundo à esquerda
+            # Precisamos desenhar o fundo para cima
             background_rect2.y -= background_rect2.height
             
 
