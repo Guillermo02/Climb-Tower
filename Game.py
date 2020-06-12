@@ -15,7 +15,7 @@ PLAYER_HEIGHT = int(TILE_SIZE * 1.5)
 FPS = 60 # Frames por segundo
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(TITULO)
-lista = [0,100,150,200,250,300,350,400,450,500]
+
 
 img_dir = path.join(path.dirname(__file__), 'img')
 background = pygame.image.load('img/trump.png').convert()
@@ -24,18 +24,19 @@ PLAYER_IMG = 'player_img'
 BLOCK = 'block'
 
 #Música de Fundo
-pygame.mixer.music.load('Mario.mp3')
-pygame.mixer.music.set_volume(0.03)
-pygame.mixer.music.play(loops=-1)
+#pygame.mixer.music.load('Mario.mp3')
+#pygame.mixer.music.set_volume(0.03)
+#pygame.mixer.music.play(loops=-1)
 
 # Define a aceleração da gravidade
-GRAVITY = 5
+GRAVITY = 3
 # Define a velocidade inicial no pulo
 JUMP_SIZE = TILE_SIZE
 # Define a velocidade em x
 SPEED_X = 10
 #Começa o jogo com 6 blocos
-INITIAL_BLOCKS = 8
+INITIAL_BLOCKS = 4
+
 
 # Define estados possíveis do jogador
 STILL = 0
@@ -61,6 +62,8 @@ class Tile(pygame.sprite.Sprite):
         # Posiciona o tile
         self.rect.x =  x
         self.rect.y =  y
+
+
 
 # Classe Jogador que representa o herói
 class Player(pygame.sprite.Sprite):
@@ -198,6 +201,9 @@ def game_screen(screen):
 
     state = PLAYING
     while state != DONE:
+        
+        if player.rect.y < -10:
+            player.rect.y = 600
 
         # Ajusta a velocidade do jogo.
         clock.tick(FPS)
@@ -229,11 +235,13 @@ def game_screen(screen):
                     player.speedx -= SPEED_X
 
         # Verifica se algum bloco saiu da janela
+        lista_x = [100, 300, 500]
+        #lista_y = [block_y + ]
         for block in world_sprites:
             if block.rect.top > HEIGHT:
                 # Destrói o bloco e cria um novo no final da tela
                 block.kill()
-                block_x = random.randint(0, 650)
+                block_x = random.choice(lista_x) + random.randint(-30,30)
                 block_y = random.randint(-300,-100)
                 new_block = Tile(assets[BLOCK], block_x, block_y)
                 all_sprites.add(new_block)
@@ -248,21 +256,10 @@ def game_screen(screen):
 
         all_sprites.update()
 
-        # Atualiza a posição da imagem de fundo.
-        background_rect.y -= player.speedy
-        # Se o fundo saiu da janela, faz ele voltar para dentro.
-        # Verifica se o fundo saiu da tela
-        if background_rect.bottom < 0:
-            background_rect.y += background_rect.height
-        screen.blit(background, background_rect)
-        # Desenhamos a imagem novamente, mas deslocada em x.
-        background_rect2 = background_rect.copy()
-        if background_rect.bottom > 0:
-            # Precisamos desenhar o fundo para cima
-            background_rect2.y -= background_rect2.height
+        
             
 
-        screen.blit(background, background_rect2) 
+        screen.blit(background, background_rect) 
         all_sprites.draw(screen)
         pygame.display.flip()
 
