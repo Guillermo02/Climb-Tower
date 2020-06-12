@@ -201,6 +201,7 @@ def game_screen(screen):
 
         # Ajusta a velocidade do jogo.
         clock.tick(FPS)
+        screen.fill((255, 255, 255))
 
         # Processa os eventos (mouse, teclado, botão, etc).
         for event in pygame.event.get():
