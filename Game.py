@@ -9,7 +9,7 @@ pygame.mixer.init()
 TITULO = 'Climbing Tower'
 WIDTH = 700 # Largura da tela
 HEIGHT = 650 # Altura da tela
-TILE_SIZE = 50 # Tamanho de cada tile (cada tile é um quadrado)
+TILE_SIZE = 30 # Tamanho de cada tile (cada tile é um quadrado)
 PLAYER_WIDTH = TILE_SIZE
 PLAYER_HEIGHT = int(TILE_SIZE * 1.5)
 FPS = 60 # Frames por segundo
@@ -24,9 +24,9 @@ PLAYER_IMG = 'player_img'
 BLOCK = 'block'
 
 #Música de Fundo
-#pygame.mixer.music.load('Mario.mp3')
-#pygame.mixer.music.set_volume(0.03)
-#pygame.mixer.music.play(loops=-1)
+pygame.mixer.music.load('Mario.mp3')
+pygame.mixer.music.set_volume(0.03)
+pygame.mixer.music.play(loops=-1)
 
 # Define a aceleração da gravidade
 GRAVITY = 3
@@ -35,7 +35,7 @@ JUMP_SIZE = TILE_SIZE
 # Define a velocidade em x
 SPEED_X = 10
 #Começa o jogo com 6 blocos
-INITIAL_BLOCKS = 4
+INITIAL_BLOCKS = 8
 
 
 # Define estados possíveis do jogador
@@ -163,7 +163,7 @@ class Player(pygame.sprite.Sprite):
 def load_assets(img_dir):
     assets = {}
     assets[PLAYER_IMG] = pygame.image.load(path.join(img_dir, 'hero.png')).convert_alpha()
-    assets[BLOCK] = pygame.image.load(path.join(img_dir, 'Plataforma.png')).convert()
+    assets[BLOCK] = pygame.image.load(path.join(img_dir, 'PlataformaF.png')).convert()
     return assets
 
 def game_screen(screen):
@@ -207,7 +207,7 @@ def game_screen(screen):
 
         # Ajusta a velocidade do jogo.
         clock.tick(FPS)
-        screen.fill((255, 255, 255))
+        
 
         # Processa os eventos (mouse, teclado, botão, etc).
         for event in pygame.event.get():
@@ -236,13 +236,13 @@ def game_screen(screen):
 
         # Verifica se algum bloco saiu da janela
         lista_x = [100, 300, 500]
-        #lista_y = [block_y + ]
+        lista_y = [-300,-200,-100]
         for block in world_sprites:
             if block.rect.top > HEIGHT:
                 # Destrói o bloco e cria um novo no final da tela
                 block.kill()
                 block_x = random.choice(lista_x) + random.randint(-30,30)
-                block_y = random.randint(-300,-100)
+                block_y = random.choice(lista_y) + random.randint(-30,30)
                 new_block = Tile(assets[BLOCK], block_x, block_y)
                 all_sprites.add(new_block)
                 world_sprites.add(new_block)
