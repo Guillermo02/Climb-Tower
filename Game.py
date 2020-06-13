@@ -9,16 +9,29 @@ pygame.mixer.init()
 TITULO = 'Climbing Tower'
 WIDTH = 700 # Largura da tela
 HEIGHT = 650 # Altura da tela
+<<<<<<< HEAD
 TILE_SIZE = 40 # Tamanho de cada tile (cada tile é um quadrado)
+=======
+TILE_SIZE = 30 # Tamanho de cada tile (cada tile é um quadrado)
+>>>>>>> d9837d727c74da5e390b35341c9619159ef1fac1
 PLAYER_WIDTH = TILE_SIZE
 PLAYER_HEIGHT = int(TILE_SIZE * 1.5)
 FPS = 60 # Frames por segundo
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption(TITULO)
+<<<<<<< HEAD
+=======
+
+>>>>>>> d9837d727c74da5e390b35341c9619159ef1fac1
 
 #Define as Imagens
 img_dir = path.join(path.dirname(__file__), 'img')
+<<<<<<< HEAD
 BACKGROUND_IMG = 'background_img'
+=======
+background = pygame.image.load('img/trump.png').convert()
+background = pygame.transform.scale(background, (700, 650))
+>>>>>>> d9837d727c74da5e390b35341c9619159ef1fac1
 PLAYER_IMG = 'player_img'
 BLOCK = 'block'
 
@@ -37,7 +50,6 @@ SPEED_X = 10
 INITIAL_BLOCKS = 8
 speed_tile = 2
 
-
 # Define estados possíveis do jogador
 STILL = 0
 JUMPING = 1
@@ -53,6 +65,7 @@ class Tile(pygame.sprite.Sprite):
 
         # Aumenta o tamanho do tile.
         tile_img = pygame.transform.scale(tile_img, (100, 20))
+        tile_img = pygame.transform.scale(tile_img, (150, TILE_SIZE))
 
         # Define a imagem do tile.
         self.image = tile_img
@@ -66,6 +79,8 @@ class Tile(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.y += self.speedy
+
+
 
 
 # Classe Jogador que representa o herói
@@ -168,6 +183,7 @@ def load_assets(img_dir):
     assets[PLAYER_IMG] = pygame.image.load(path.join(img_dir, 'hero.png')).convert_alpha()
     assets[BLOCK] = pygame.image.load(path.join(img_dir, 'Plataforma.png')).convert()
     assets[BACKGROUND_IMG] = pygame.image.load(path.join(img_dir, 'trump.png')).convert()
+    assets[BLOCK] = pygame.image.load(path.join(img_dir, 'PlataformaF.png')).convert()
     return assets
 
 def game_screen(screen):
@@ -185,7 +201,7 @@ def game_screen(screen):
 
     # Cria um grupo somente com os sprites de bloco.
     blocks = pygame.sprite.Group()
-    
+
     # Carrega o fundo do jogo
     background = assets[BACKGROUND_IMG]
     # Redimensiona o fundo   
@@ -207,6 +223,10 @@ def game_screen(screen):
         # Adiciona também no grupo de todos os sprites para serem atualizados e desenhados
         all_sprites.add(block)
 
+    # Cria Sprite do jogador
+    player = Player(assets[PLAYER_IMG], world_sprites)
+    all_sprites.add(player)
+
     PLAYING = 0
     DONE = 1
 
@@ -219,6 +239,10 @@ def game_screen(screen):
         # Ajusta a velocidade do jogo.
         clock.tick(FPS)
         
+<<<<<<< HEAD
+=======
+
+>>>>>>> d9837d727c74da5e390b35341c9619159ef1fac1
         # Processa os eventos (mouse, teclado, botão, etc).
         for event in pygame.event.get():
 
@@ -245,17 +269,39 @@ def game_screen(screen):
                     player.speedx -= SPEED_X
 
         # Verifica se algum bloco saiu da janela
+        lista_x = [100, 300, 500]
+        lista_y = [-300,-200,-100]
         for block in world_sprites:
             if block.rect.top > HEIGHT:
                 # Destrói o bloco e cria um novo no final da tela
                 block.kill()
                 block_x = random.choice(lista_x) + random.randint(-30,30)
+<<<<<<< HEAD
                 block_y = 0
                 new_block = Tile(assets[BLOCK], block_x, block_y, speed_tile)
                 all_sprites.add(new_block)
                 world_sprites.add(new_block)
 
         all_sprites.update()
+=======
+                block_y = random.choice(lista_y) + random.randint(-30,30)
+                new_block = Tile(assets[BLOCK], block_x, block_y)
+                all_sprites.add(new_block)
+                world_sprites.add(new_block)
+
+        # A cada loop, redesenha o fundo e os sprites
+        # Depois de processar os eventos.
+        # Como o jogador vai ficar parado, o fundo e os objetos no mundo devem
+        # se mover com a velocidade do personagem no sentido oposto.
+        for block in world_sprites:
+            block.rect.y -= player.speedy
+
+        all_sprites.update()
+
+        
+            
+
+>>>>>>> d9837d727c74da5e390b35341c9619159ef1fac1
         screen.blit(background, background_rect) 
         all_sprites.draw(screen)
         pygame.display.flip()
