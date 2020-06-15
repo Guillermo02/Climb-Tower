@@ -29,17 +29,13 @@ pygame.mixer.music.set_volume(0.03)
 pygame.mixer.music.play(loops=-1)
 
 # Define a aceleração da gravidade
-GRAVITY = 1
+GRAVITY = 3
 # Define a velocidade inicial no pulo
 JUMP_SIZE = TILE_SIZE
 # Define a velocidade em x
 SPEED_X = 10
 #Começa o jogo com 6 blocos
-<<<<<<< HEAD
 INITIAL_BLOCKS = 8
-=======
-INITIAL_BLOCKS = 3
->>>>>>> 189e40981ce0134fb76a4c4349931df559b901f3
 
 # Define estados possíveis do jogador
 STILL = 0
@@ -173,11 +169,7 @@ def load_assets(img_dir):
     assets[PLAYER_IMG] = pygame.image.load(path.join(img_dir, 'hero.png')).convert_alpha()
     assets[BLOCK] = pygame.image.load(path.join(img_dir, 'Plataforma.png')).convert()
     assets[BACKGROUND_IMG] = pygame.image.load(path.join(img_dir, 'trump.png')).convert()
-<<<<<<< HEAD
     assets[FONT] = pygame.font.Font(path.join(img_dir, 'font.ttf'), 30)
-=======
-    assets[FONT] = pygame.font.Font(path.join(img_dir, 'font.ttf'), 28)
->>>>>>> 189e40981ce0134fb76a4c4349931df559b901f3
     return assets
 
 def game_screen(screen):
@@ -206,23 +198,16 @@ def game_screen(screen):
     player = Player(assets[PLAYER_IMG], world_sprites)
     all_sprites.add(player)
 
-<<<<<<< HEAD
     #Lista das posições dos tiles em x
     lista_x = [40, 100, 200, 300, 400, 500, 600]
+    lista_y = [-100,-140,-180,-220,-260,-300,-340,-380]
     
     #Velocidade inicial das plataformas
     speed_tile = 1
-=======
-    #Lista das posições dos tiles
-    lista_x = [40, 100, 200, 300, 400, 500, 600]
-    
-    #Velocidade inicial das plataformas
-    speed_tile=1
->>>>>>> 189e40981ce0134fb76a4c4349931df559b901f3
 
     # Cria tiles de acordo com o mapa
     for i in range(INITIAL_BLOCKS):
-        block_x = random.randint(40,650)
+        block_x = random.choice(lista_x) + random.randint(-30,30)
         block_y = random.randint(0, HEIGHT)
         block = Tile(assets[BLOCK], block_x, block_y,speed_tile)
         world_sprites.add(block)
@@ -238,26 +223,14 @@ def game_screen(screen):
         #porem os tiles irão descer mais rápido
         if player.rect.y < -10:
             player.rect.y = 600
-<<<<<<< HEAD
             speed_tile += 0.5
             for block in world_sprites:
                 block.kill ()
                 block_x = random.choice(lista_x) + random.randint(-30,30)
-                block_y = random.randint(-400, 200)
+                block_y = random.choice(lista_y) + random.randint(-30,30)
                 new_block = Tile(assets[BLOCK], block_x, block_y, speed_tile)
                 all_sprites.add(new_block)
                 world_sprites.add(new_block)
-=======
-            speed_tile += 1
-            for block in world_sprites:
-                block.kill ()
-                block_x = random.choice(lista_x) + random.randint(-30,30)
-                block_y = random.randint(-200, 0)
-                new_block = Tile(assets[BLOCK], block_x, block_y, speed_tile)
-                all_sprites.add(new_block)
-                world_sprites.add(new_block)
-
->>>>>>> 189e40981ce0134fb76a4c4349931df559b901f3
 
         # Ajusta a velocidade do jogo.
         clock.tick(FPS)
@@ -294,7 +267,6 @@ def game_screen(screen):
                 # Destrói o bloco e cria um novo no final da tela
                 block.kill()
                 block_x = random.choice(lista_x) + random.randint(-30,30)
-<<<<<<< HEAD
                 block_y = random.randint(-400, 200)
                 new_block = Tile(assets[BLOCK], block_x, block_y, speed_tile)
                 all_sprites.add(new_block)
@@ -303,31 +275,6 @@ def game_screen(screen):
         screen.blit(background, background_rect)
         all_sprites.update()
         all_sprites.draw(screen)
-=======
-                block_y = random.randint(-20, 0)
-                new_block = Tile(assets[BLOCK], block_x, block_y, speed_tile)
-                all_sprites.add(new_block)
-                world_sprites.add(new_block)
-            
-        
-        screen.blit(background, background_rect)
-        all_sprites.update()
-        
-        if speed_tile >= 2:
-            text_surface = assets['font'].render('Você ganhou, parabéns!', True, (255, 255, 0))
-            text_rect = text_surface.get_rect()
-            text_rect.midtop = (350, 325)
-            screen.fill((50,25,75))
-            screen.blit(text_surface, text_rect)
-            block.kill()
-            if event.type == pygame.KEYDOWN:
-                pygame.quit()
-
-        
-        all_sprites.draw(screen)
-        
-        pygame.display.flip()
->>>>>>> 189e40981ce0134fb76a4c4349931df559b901f3
 
         #Quando o player atingir uma certa velocidade máxima o jogo encerra e ele vence
         if speed_tile >= 3:
@@ -338,7 +285,7 @@ def game_screen(screen):
             screen.blit(text, posição)
             block.kill()
             #Fechar a janela do jogo depois de pressionar qualquer tecla
-            if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
                 pygame.quit()
         
         all_sprites.draw(screen)
