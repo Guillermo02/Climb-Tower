@@ -9,7 +9,7 @@ pygame.mixer.init()
 TITULO = 'Climbing Tower'
 WIDTH = 700 # Largura da tela
 HEIGHT = 650 # Altura da tela
-TILE_SIZE = 40 # Tamanho de cada tile (cada tile é um quadrado)
+TILE_SIZE = 40 # Tamanho de cada tile
 PLAYER_WIDTH = TILE_SIZE
 PLAYER_HEIGHT = int(TILE_SIZE * 1.5)
 FPS = 60 # Frames por segundo
@@ -28,18 +28,21 @@ pygame.mixer.music.set_volume(0.03)
 pygame.mixer.music.play(loops=-1)
 
 # Define a aceleração da gravidade
-GRAVITY = 0.5
+GRAVITY = 1
 # Define a velocidade inicial no pulo
 JUMP_SIZE = TILE_SIZE
 # Define a velocidade em x
 SPEED_X = 10
 #Começa o jogo com 6 blocos
-INITIAL_BLOCKS = 8
+INITIAL_BLOCKS = 3
 
 # Define estados possíveis do jogador
 STILL = 0
 JUMPING = 1
 FALLING = 2
+
+#perg_jogador = input("Qual modalidae deseja jogar? Falso(F), Médio(M) ou Difícil(D): ")
+
 
 # Class que representa os blocos do cenário
 class Tile(pygame.sprite.Sprite):
@@ -194,13 +197,14 @@ def game_screen(screen):
     all_sprites.add(player)
 
     #Lista das posições dos tiles
-    lista_x = [100, 300, 500]
+    lista_x = [40, 100, 200, 300, 400, 500, 600]
+    
     #Velocidade inicial das plataformas
     speed_tile=1
 
     # Cria tiles de acordo com o mapa
     for i in range(INITIAL_BLOCKS):
-        block_x = random.randint(0,700)
+        block_x = random.randint(40,650)
         block_y = random.randint(0, HEIGHT)
         block = Tile(assets[BLOCK], block_x, block_y,speed_tile)
         world_sprites.add(block)
@@ -215,7 +219,14 @@ def game_screen(screen):
         
         if player.rect.y < -10:
             player.rect.y = 600
-            speed_tile += 0.5
+            speed_tile += 0.2
+            for block in world_sprites:
+                block.kill ()
+                block_x = random.choice(lista_x) + random.randint(-30,30)
+                block_y = random.randint(-200, 0)
+                new_block = Tile(assets[BLOCK], block_x, block_y, speed_tile)
+                all_sprites.add(new_block)
+                world_sprites.add(new_block)
 
 
         # Ajusta a velocidade do jogo.
@@ -253,10 +264,11 @@ def game_screen(screen):
                 # Destrói o bloco e cria um novo no final da tela
                 block.kill()
                 block_x = random.choice(lista_x) + random.randint(-30,30)
-                block_y = random.randint(-10, 0)
+                block_y = random.randint(-20, 0)
                 new_block = Tile(assets[BLOCK], block_x, block_y, speed_tile)
                 all_sprites.add(new_block)
                 world_sprites.add(new_block)
+            
 
         all_sprites.update()
         screen.blit(background, background_rect) 
