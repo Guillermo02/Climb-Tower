@@ -21,6 +21,7 @@ img_dir = path.join(path.dirname(__file__), 'img')
 BACKGROUND_IMG = 'background_img'
 PLAYER_IMG = 'player_img'
 BLOCK = 'block'
+FONT = 'font'
 
 #Música de Fundo
 pygame.mixer.music.load('Mario.mp3')
@@ -168,6 +169,7 @@ def load_assets(img_dir):
     assets[PLAYER_IMG] = pygame.image.load(path.join(img_dir, 'hero.png')).convert_alpha()
     assets[BLOCK] = pygame.image.load(path.join(img_dir, 'Plataforma.png')).convert()
     assets[BACKGROUND_IMG] = pygame.image.load(path.join(img_dir, 'trump.png')).convert()
+    assets[FONT] = pygame.font.Font(path.join(img_dir, 'font.ttf'), 28)
     return assets
 
 def game_screen(screen):
@@ -219,7 +221,7 @@ def game_screen(screen):
         
         if player.rect.y < -10:
             player.rect.y = 600
-            speed_tile += 0.2
+            speed_tile += 1
             for block in world_sprites:
                 block.kill ()
                 block_x = random.choice(lista_x) + random.randint(-30,30)
@@ -247,7 +249,7 @@ def game_screen(screen):
                     player.speedx -= SPEED_X
                 elif event.key == pygame.K_RIGHT:
                     player.speedx += SPEED_X
-                elif event.key == pygame.K_UP or event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_UP:
                     player.jump()
 
             # Verifica se soltou alguma tecla.
@@ -269,10 +271,23 @@ def game_screen(screen):
                 all_sprites.add(new_block)
                 world_sprites.add(new_block)
             
-
+        
+        screen.blit(background, background_rect)
         all_sprites.update()
-        screen.blit(background, background_rect) 
+        
+        if speed_tile >= 2:
+            text_surface = assets['font'].render('Você ganhou, parabéns!', True, (255, 255, 0))
+            text_rect = text_surface.get_rect()
+            text_rect.midtop = (350, 325)
+            screen.fill((50,25,75))
+            screen.blit(text_surface, text_rect)
+            block.kill()
+            if event.type == pygame.KEYDOWN:
+                pygame.quit()
+
+        
         all_sprites.draw(screen)
+        
         pygame.display.flip()
 
 # Comando para evitar travamentos.
