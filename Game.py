@@ -28,14 +28,13 @@ pygame.mixer.music.set_volume(0.03)
 pygame.mixer.music.play(loops=-1)
 
 # Define a aceleração da gravidade
-GRAVITY = 1.5
+GRAVITY = 0.5
 # Define a velocidade inicial no pulo
 JUMP_SIZE = TILE_SIZE
 # Define a velocidade em x
 SPEED_X = 10
 #Começa o jogo com 6 blocos
 INITIAL_BLOCKS = 8
-speed_tile = 1.5
 
 # Define estados possíveis do jogador
 STILL = 0
@@ -194,8 +193,11 @@ def game_screen(screen):
     player = Player(assets[PLAYER_IMG], world_sprites)
     all_sprites.add(player)
 
-    #LIsta das posições dos tiles
+    #Lista das posições dos tiles
     lista_x = [100, 300, 500]
+    #Velocidade inicial das plataformas
+    speed_tile=1
+
     # Cria tiles de acordo com o mapa
     for i in range(INITIAL_BLOCKS):
         block_x = random.randint(0,700)
